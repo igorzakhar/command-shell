@@ -84,6 +84,24 @@ class CommandShell(Cmd):
                 except OSError as err:
                     print('Error: {}: {}'.format(err.filename, err.strerror))
 
+    @add_to_history
+    def do_grep(self, args):
+        pattern, *files = args.split(' ')
+
+        for file in files:
+            try:
+                with open(file, 'r') as fp:
+                    for line in fp:
+                        if line.find(pattern) is not -1:
+                            print(
+                                '{}'.format(
+                                    ':'.join((file, line.rstrip()))
+                                    if len(files) > 1 else line.rstrip()
+                                )
+                            )
+            except OSError as err:
+                print('Error: {}: {}'.format(err.filename, err.strerror))
+
     def _set_prompt(self, path):
         return '{}> '.format(path.replace(self.home_dir, '~'))
 
