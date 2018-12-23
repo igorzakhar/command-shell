@@ -7,7 +7,7 @@ import os
 def add_to_history(method):
     @wraps(method)
     def wrapper(self, *args, **kwargs):
-        self.history.append(method.__name__)
+        self.history.append((method.__name__, args[0]))
         return method(self, *args, **kwargs)
     return wrapper
 
@@ -48,8 +48,8 @@ class CommandShell(Cmd):
 
     @add_to_history
     def do_history(self, arg):
-        for num, command in enumerate(self.history):
-            print('{:>4}  {}'.format(num + 1, command.replace('do_', '')))
+        for num, (cmd, arg) in enumerate(self.history):
+            print('{:>4}  {} {}'.format(num + 1, cmd.replace('do_', ''), arg))
 
     @add_to_history
     def do_cd(self, arg):
