@@ -67,7 +67,6 @@ class CommandShell(Cmd):
 
     @add_to_history
     def do_cat(self, args):
-        # print(arg.split(' '))
         if args == '':
             try:
                 line = sys.stdin.readline()
