@@ -2,6 +2,7 @@ from cmd import Cmd
 from functools import wraps
 import itertools
 import os
+import sys
 
 
 def add_to_history(method):
@@ -63,6 +64,18 @@ class CommandShell(Cmd):
             self.prompt = self._set_prompt(path)
         except OSError as err:
             print('Error: ', err.strerror)
+
+    @add_to_history
+    def do_cat(self, arg):
+        # print(arg.split(' '))
+        try:
+            if arg == '':
+                line = sys.stdin.readline()
+                while line:
+                    print(line.strip())
+                    line = sys.stdin.readline()
+        except KeyboardInterrupt:
+            sys.stdout.write('\n')
 
     def _set_prompt(self, path):
         return '{}> '.format(path.replace(self.home_dir, '~'))
