@@ -36,51 +36,59 @@ class CommandShell(Cmd):
         self.prompt = '{}> '.format(os.getcwd().replace(self.home_dir, '~'))
 
     @add_to_history
-    def do_ls(self, arg):
+    def do_ls(self, args):
         files_list = sorted(
             os.listdir(os.getcwd()), key=lambda x: x.upper().replace("_", "")
         )
         print_list_files(files_list)
 
     @add_to_history
-    def do_env(self, arg):
+    def do_env(self, args):
         for var in os.environ:
             print("{}={}".format(var, os.environ[var]))
 
     @add_to_history
-    def do_history(self, arg):
+    def do_history(self, args):
         for num, (cmd, arg) in enumerate(self.history):
             print('{:>4}  {} {}'.format(num + 1, cmd.replace('do_', ''), arg))
 
     @add_to_history
-    def do_cd(self, arg):
-        if len(arg) == 0:
+    def do_cd(self, args):
+        if len(args) == 0:
             os.chdir(self.home_dir)
             self.prompt = self._set_prompt(self.home_dir)
 
         try:
-            path = os.path.abspath(os.path.expanduser(arg))
+            path = os.path.abspath(os.path.expanduser(args))
             os.chdir(path)
             self.prompt = self._set_prompt(path)
         except OSError as err:
             print('Error: ', err.strerror)
 
     @add_to_history
-    def do_cat(self, arg):
+    def do_cat(self, args):
         # print(arg.split(' '))
-        try:
-            if arg == '':
+        if args == '':
+            try:
                 line = sys.stdin.readline()
                 while line:
                     print(line.strip())
                     line = sys.stdin.readline()
-        except KeyboardInterrupt:
-            sys.stdout.write('\n')
+            except KeyboardInterrupt:
+                sys.stdout.write('\n')
+        else:
+            for arg in args.split(' '):
+                try:
+                    with open(arg, 'r') as fp:
+                        for line in fp:
+                            print(line.strip())
+                except OSError as err:
+                    print('Error: {}: {}'.format(err.filename, err.strerror))
 
     def _set_prompt(self, path):
         return '{}> '.format(path.replace(self.home_dir, '~'))
 
-    def do_exit(self, arg):
+    def do_exit(self, args):
         return True
 
     def postloop(self):
