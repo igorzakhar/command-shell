@@ -102,6 +102,13 @@ class CommandShell(Cmd):
             except OSError as err:
                 print('Error: {}: {}'.format(err.filename, err.strerror))
 
+    @add_to_history
+    def do_echo(self, args):
+        if args.startswith('$'):
+            print(os.environ.get(args[1:], ''))
+        else:
+            print(args)
+
     def _set_prompt(self, path):
         return '{}> '.format(path.replace(self.home_dir, '~'))
 
