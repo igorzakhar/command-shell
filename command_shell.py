@@ -3,11 +3,14 @@ from functools import wraps
 import itertools
 import os
 import sys
+import subprocess
 
 
 def add_to_history(method):
     @wraps(method)
     def wrapper(self, *args, **kwargs):
+        if method.__name__ == 'default':
+            method.__name__ = ''
         self.history.append((method.__name__, args[0]))
         return method(self, *args, **kwargs)
     return wrapper
@@ -50,7 +53,12 @@ class CommandShell(Cmd):
     @add_to_history
     def do_history(self, args):
         for num, (cmd, arg) in enumerate(self.history):
-            print('{:>4}  {} {}'.format(num + 1, cmd.replace('do_', ''), arg))
+            print('{:>4}  {}{}{}'.format(
+                num + 1,
+                cmd.replace('do_', ''),
+                ' ' if cmd else '',
+                arg
+            ))
 
     @add_to_history
     def do_cd(self, args):
@@ -108,6 +116,15 @@ class CommandShell(Cmd):
             print(os.environ.get(args[1:], ''))
         else:
             print(args)
+
+    @add_to_history
+    def default(self, args):
+        command = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE)
+        output = command.communicate()[0].decode('utf-8')
+        if output:
+            print(output.rstrip())
+        else:
+            return
 
     def _set_prompt(self, path):
         return '{}> '.format(path.replace(self.home_dir, '~'))
