@@ -119,13 +119,13 @@ class CommandShell(Cmd):
 
     @add_to_history
     def default(self, args):
-        command = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE)
-        output = command.communicate()[0].decode('utf-8')
+        command = subprocess.run(args, shell=True)
+        output = command.stdout
 
-        if output == '':
+        if output is None:
             return
 
-        print(output.rstrip())
+        print(output.decode('utf-8').rstrip())
 
     def _set_prompt(self, path):
         return '{}> '.format(path.replace(self.home_dir, '~'))
