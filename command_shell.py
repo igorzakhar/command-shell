@@ -16,15 +16,6 @@ def add_to_history(method):
     return wrapper
 
 
-def print_list_files(files_list, col_count=5):
-    col, dangling = divmod(len(files_list), col_count)
-    iterator = iter(files_list)
-    columns = [take(col + (dangling > i), iterator) for i in range(col_count)]
-    paddings = [max(map(len, col)) for col in columns if len(col) > 0]
-    for row in itertools.zip_longest(*columns, fillvalue=''):
-        print('  '.join(file.ljust(pad) for file, pad in zip(row, paddings)))
-
-
 def take(n, iterable):
     "Return first n items of the iterable as a list"
     return list(itertools.islice(iterable, n))
@@ -43,7 +34,7 @@ class CommandShell(Cmd):
         files_list = sorted(
             os.listdir(os.getcwd()), key=lambda x: x.upper().replace("_", "")
         )
-        print_list_files(files_list)
+        self.columnize(files_list)
 
     @add_to_history
     def do_env(self, args):
