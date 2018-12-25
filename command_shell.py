@@ -121,10 +121,11 @@ class CommandShell(Cmd):
     def default(self, args):
         command = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE)
         output = command.communicate()[0].decode('utf-8')
-        if output:
-            print(output.rstrip())
-        else:
+
+        if output == '':
             return
+
+        print(output.rstrip())
 
     def _set_prompt(self, path):
         return '{}> '.format(path.replace(self.home_dir, '~'))
